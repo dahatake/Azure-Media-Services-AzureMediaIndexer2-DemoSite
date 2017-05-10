@@ -74,7 +74,7 @@ namespace AzureMediaIndexer
             Console.WriteLine("  アップロード処理完了");
             Console.WriteLine($"  アップロード処理時間: {sw.Elapsed.ToString()}");
 
-            Console.WriteLine("*** 2. Encode 実行 ***");
+            Console.WriteLine("*** 2.1. Encode 実行 (配信用) ***");
             sw.Reset();
             sw.Start();
             IAsset outputAsset;
@@ -86,6 +86,20 @@ namespace AzureMediaIndexer
                 out outputAsset);
             Console.WriteLine("  Encode 完了");
             Console.WriteLine($"  Encode 時間: { sw.Elapsed.ToString()}");
+
+            Console.WriteLine("*** 2.2. Encode 実行 (Indexer 用) ***");
+            sw.Reset();
+            sw.Start();
+            IAsset outputAssetForIndexer;
+
+            PlayerURL = MediaProcess(context,
+                asset,
+                "Media Encoder Standard",
+                "H264 Single Bitrate 16x9 SD",
+                out outputAssetForIndexer);
+            Console.WriteLine("  Encode 完了");
+            Console.WriteLine($"  Encode 時間: { sw.Elapsed.ToString()}");
+
 
             Console.WriteLine("*** 3. Indexing 実行 ***");
             sw.Reset();
@@ -125,7 +139,7 @@ namespace AzureMediaIndexer
             var indexConfigString = File.ReadAllText(IndexingConfigurationFile).Replace("{indexLang}", indexLang);
 
             var originalVTTURL = MediaProcess(context,
-                asset,
+                outputAssetForIndexer,
                 "Azure Media Indexer 2 Preview",
                 indexConfigString,
                 out outputAsset);
